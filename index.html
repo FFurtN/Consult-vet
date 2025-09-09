@@ -4,106 +4,208 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Consulvet</title>
+  <!-- Favicon (logo en la pestaña) -->
+  <link rel="icon" type="image/png" href="logo.png">
+
   <style>
     body {
-      font-family: Arial, sans-serif;
       margin: 0;
-      padding: 0;
-      background: #fff;
+      font-family: Arial, sans-serif;
+      background: #ffffff;
+      color: #333;
       text-align: center;
+      padding-bottom: 60px; 
     }
-    header {
+
+    #splash {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
       background: #00913f;
-      color: white;
-      padding: 20px;
-      font-size: 24px;
-      font-weight: bold;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+      animation: fadeOut 1s ease 2s forwards;
     }
-    .container {
-      margin: 20px;
+    #splash img {
+      max-width: 150px;
+      margin-bottom: 20px;
     }
-    input, button {
-      padding: 10px;
-      font-size: 16px;
+    #splash h1, #splash h2 {
+      color: #fff;
       margin: 5px;
     }
-    #resultado {
+    @keyframes fadeOut {
+      to { opacity: 0; visibility: hidden; }
+    }
+
+    header {
+      background: #00913f;
+      padding: 10px;
+      color: white;
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    .container {
+      margin: 20px auto;
+      max-width: 600px;
+      padding: 0 15px;
+    }
+
+    input[type="number"] {
+      padding: 10px;
+      font-size: 16px;
+      width: 70%;
+      border: 1px solid #00913f;
+      border-radius: 8px;
+      outline: none;
+    }
+
+    button {
+      background: #00913f;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 10px;
+      font-size: 16px;
+    }
+    button:hover {
+      opacity: 0.9;
+    }
+
+    #result {
       margin-top: 20px;
       text-align: left;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
-      border: 1px solid #00913f;
-      padding: 15px;
-      border-radius: 10px;
       background: #f9f9f9;
+      border-radius: 10px;
+      padding: 15px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
-    .botones {
-      margin-top: 40px;
+    #result p {
+      margin: 8px 0;
+      font-size: 16px;
+    }
+    #error {
+      color: red;
+      font-weight: bold;
+      margin-top: 15px;
+    }
+
+    footer.bottom-buttons {
+      position: fixed;
+      bottom: 0; left: 0;
+      width: 100%;
       background: #00913f;
-      padding: 20px;
+      padding: 10px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
     }
-    .botones a {
-      display: inline-block;
-      margin: 10px;
-      padding: 10px 20px;
+    footer.bottom-buttons a,
+    footer.bottom-buttons button {
+      padding: 8px 14px;
+      border-radius: 6px;
       background: white;
       color: #00913f;
-      border-radius: 8px;
       text-decoration: none;
+      font-size: 14px;
       font-weight: bold;
-      transition: 0.3s;
+      border: none;
+      cursor: pointer;
     }
-    .botones a:hover {
-      background: #006f30;
-      color: white;
+    footer.bottom-buttons a:hover,
+    footer.bottom-buttons button:hover {
+      background: #f0f0f0;
     }
   </style>
 </head>
 <body>
-  <header>CONSULVET</header>
-  <div class="container">
-    <h2>Buscar paciente</h2>
-    <input type="text" id="codigoInput" placeholder="Ingresa el código">
-    <button onclick="buscarPaciente()">Buscar</button>
-    <div id="resultado"></div>
+  
+  <div id="splash">
+    <img src="logo.png" alt="Logo Consulvet">
+    <h1>Los mejores amigos de tus mejores amigos</h1>
+    <h2>Tu mascota, nuestra prioridad</h2>
   </div>
 
-  <div class="botones">
-    <a href="https://maps.app.goo.gl/TBg9VfHyB4EoUkZf6" target="_blank">Ubicación</a>
-    <a href="tel:+595819822212">Teléfono</a>
-    <a href="https://wa.me/595819822212" target="_blank">WhatsApp</a>
+  <header>Consulvet</header>
+
+  <div class="container">
+    <h2>Consulta de Pacientes</h2>
+    <input type="number" id="codigoInput" placeholder="Ingrese código del paciente">
+    <br>
+    <button onclick="buscarPaciente()">Buscar</button>
+    <div id="result"></div>
+    <div id="error"></div>
   </div>
+
+  <footer class="bottom-buttons">
+    <a href="https://maps.app.goo.gl/TBg9VfHyB4EoUkZf6" target="_blank">Ubicación</a>
+    <button onclick="copiarTelefono()">Tel: +595 819 822212</button>
+    <a href="https://wa.me/595819822212" target="_blank">WhatsApp</a>
+  </footer>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycby6UzDWfpr5V8YFjJhFjZrfTdr00_QhrHhRoXyCvxjodupb4jhC8DiGviWQEnSsntSc/exec";
+    // URL del Web App de Google Apps Script (debe estar desplegado como "Cualquiera con el enlace")
+    const DATA_URL = "https://script.google.com/macros/s/AKfycby6UzDWfpr5V8YFjJhFjZrfTdr00_QhrHhRoXyCvxjodupb4jhC8DiGviWQEnSsntSc/exec";
+    let pacientes = [];
 
-    async function buscarPaciente() {
-      const codigoInput = document.getElementById("codigoInput").value.trim();
-      const resultadoDiv = document.getElementById("resultado");
-      resultadoDiv.innerHTML = "Buscando...";
+    // Cargar datos de la hoja
+    fetch(DATA_URL)
+      .then(res => {
+        if (!res.ok) throw new Error("Error al conectar con la base de datos");
+        return res.json();
+      })
+      .then(data => {
+        pacientes = data;
+      })
+      .catch(err => {
+        document.getElementById("error").textContent = "⚠️ No se pudo cargar la base de datos.";
+        console.error(err);
+      });
 
-      try {
-        const response = await fetch(API_URL);
-        const data = await response.json();
+    function buscarPaciente() {
+      const codigo = document.getElementById("codigoInput").value.trim();
+      const resultDiv = document.getElementById("result");
+      const errorDiv = document.getElementById("error");
 
-        // Busca coincidencia exacta como texto
-        const paciente = data.find(p => p.Codigo.toString().trim() === codigoInput);
+      resultDiv.innerHTML = "";
+      errorDiv.innerHTML = "";
 
-        if (paciente) {
-          let html = "<h3>Datos del Paciente</h3><ul>";
-          for (let clave in paciente) {
-            html += `<li><strong>${clave}:</strong> ${paciente[clave]}</li>`;
-          }
-          html += "</ul>";
-          resultadoDiv.innerHTML = html;
-        } else {
-          resultadoDiv.innerHTML = "<p style='color:red;'>❌ No se ha encontrado ese código.</p>";
-        }
-      } catch (error) {
-        resultadoDiv.innerHTML = "<p style='color:red;'>Error al conectar con la base de datos.</p>";
-        console.error(error);
+      if (!codigo) {
+        errorDiv.textContent = "⚠️ Por favor, ingrese un código.";
+        return;
       }
+
+      if (pacientes.length === 0) {
+        errorDiv.textContent = "⚠️ Base de datos no disponible. Intente más tarde.";
+        return;
+      }
+
+      const paciente = pacientes.find(p => String(p.Codigo) === codigo);
+
+      if (paciente) {
+        let html = "";
+        for (let key in paciente) {
+          html += `<p><strong>${key}:</strong> ${paciente[key]}</p>`;
+        }
+        resultDiv.innerHTML = html;
+      } else {
+        errorDiv.textContent = "❌ No se encontró un paciente con ese código.";
+      }
+    }
+
+    function copiarTelefono() {
+      const numero = "+595819822212";
+      navigator.clipboard.writeText(numero).then(() => {
+        alert("Número copiado: " + numero);
+      }).catch(err => {
+        console.error("Error al copiar:", err);
+      });
     }
   </script>
 </body>
