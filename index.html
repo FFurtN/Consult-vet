@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Consulvet</title>
-  <!-- Favicon (logo en la pestaña) -->
+  
   <link rel="icon" type="image/png" href="logo.png">
 
   <style>
@@ -150,11 +150,11 @@
   </footer>
 
   <script>
-    // URL del Web App de Google Apps Script (debe estar desplegado como "Cualquiera con el enlace")
+    
     const DATA_URL = "https://script.google.com/macros/s/AKfycby6UzDWfpr5V8YFjJhFjZrfTdr00_QhrHhRoXyCvxjodupb4jhC8DiGviWQEnSsntSc/exec";
     let pacientes = [];
 
-    // Cargar datos de la hoja
+    
     fetch(DATA_URL)
       .then(res => {
         if (!res.ok) throw new Error("Error al conectar con la base de datos");
@@ -210,3 +210,4 @@
   </script>
 </body>
 </html>
+
